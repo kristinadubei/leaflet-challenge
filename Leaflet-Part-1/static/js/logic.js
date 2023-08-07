@@ -15,7 +15,7 @@ function markerSize(magnitude) {
 };
 
 // Function to determine marker color by depth
-function chooseColor(depth){
+function chooseColorD(depth){
   if (depth < 10) return "#00FF00";
   else if (depth < 30) return "#9dff00";
   else if (depth < 50) return "#f6ff00";
@@ -23,6 +23,17 @@ function chooseColor(depth){
   else if (depth < 90) return "#ff5e00";
   else return "#FF0000";
 }
+
+// Function to determine marker color by magnitude (for legend)
+// [1.0, 2.5, 4.0, 5.5, 8.0]
+function chooseColorM(mag){
+    if (mag < 1.0) return "#00FF00";
+    else if (mag < 2.5) return "#9dff00";
+    else if (mag < 4.0) return "#f6ff00";
+    else if (mag < 5.5) return "#ff9900";
+    else if (mag < 8.0) return "#ff5e00";
+    else return "#FF0000";
+  }
 
 function createFeatures(earthquakeData) {
 
@@ -43,7 +54,7 @@ function createFeatures(earthquakeData) {
       // Determine the style of markers based on properties
       let markers = {
         radius: markerSize(feature.properties.mag),
-        fillColor: chooseColor(feature.geometry.coordinates[2]),
+        fillColor: chooseColorD(feature.geometry.coordinates[2]),
         fillOpacity: 0.65,
         color: "black",
         stroke: true,
@@ -56,6 +67,22 @@ function createFeatures(earthquakeData) {
   // Send earthquakes layer to the createMap function/
   createMap(earthquakes);
 }
+
+ // Add legend
+ let legend = L.control({position: 'bottomright'});
+
+ legend.onAdd = function (map) {
+    let div = L.DomUtil.create('div', 'info legend'),
+        grades = [1.0, 2.5, 4.0, 5.5, 8.0];
+
+    // loop through density intervals
+    for (let i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + chooseColorM(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+    return div;
+};
 
 function createMap(earthquakes) {
 
@@ -73,7 +100,7 @@ function createMap(earthquakes) {
     layers: [maplayer, earthquakes]
   });
 
-  // Add legend
-  // to do
+  // Add the legend
+  legend.addTo(myMap);
 
 };
