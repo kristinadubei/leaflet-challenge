@@ -1,15 +1,15 @@
 // Store our API endpoint as queryUrl.
-var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
+let queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 // Perform a GET request to the query URL
 d3.json(queryUrl).then(function (data) {
   // Console log the data retrieved 
   console.log(data);
-  // Once we get a response, perform createFeatures function on data.features object
+  // Perform createFeatures function on data.features object
   createFeatures(data.features);
 });
 
-// Function to determine marker size
+// Function to determine marker size baseed on magnitude
 function markerSize(magnitude) {
   return magnitude * 20000;
 };
@@ -17,10 +17,10 @@ function markerSize(magnitude) {
 // Function to determine marker color by depth
 function chooseColor(depth){
   if (depth < 10) return "#00FF00";
-  else if (depth < 30) return "greenyellow";
-  else if (depth < 50) return "yellow";
-  else if (depth < 70) return "orange";
-  else if (depth < 90) return "orangered";
+  else if (depth < 30) return "#9dff00";
+  else if (depth < 50) return "#f6ff00";
+  else if (depth < 70) return "#ff9900";
+  else if (depth < 90) return "#ff5e00";
   else return "#FF0000";
 }
 
@@ -34,14 +34,14 @@ function createFeatures(earthquakeData) {
 
   // Create a GeoJSON layer that contains the features array on the earthquakeData object.
   // Run the onEachFeature function once for each piece of data in the array.
-  var earthquakes = L.geoJSON(earthquakeData, {
+  let earthquakes = L.geoJSON(earthquakeData, {
     onEachFeature: onEachFeature,
 
     // Point to layer used to alter markers
     pointToLayer: function(feature, latlng) {
 
       // Determine the style of markers based on properties
-      var markers = {
+      let markers = {
         radius: markerSize(feature.properties.mag),
         fillColor: chooseColor(feature.geometry.coordinates[2]),
         fillOpacity: 0.65,
@@ -60,12 +60,12 @@ function createFeatures(earthquakeData) {
 function createMap(earthquakes) {
 
   // Create tile layer
-  var maplayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  let maplayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
 
   // Create the map, add maplayer and earthquakes layers to display on load.
-  var myMap = L.map("map", {
+  let myMap = L.map("map", {
     center: [
         35.37, -92.56
     ],
